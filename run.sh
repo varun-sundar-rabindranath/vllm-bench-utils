@@ -1,10 +1,11 @@
 #!/bin/bash
 set -e
 set -u
-set -x
 
-LAUNCH_DATA_JSON="./test_launch_data.json"
-BENCH_DATA_JSON="./test_bench_data.json"
+timestamp=$(date +%s)
+
+LAUNCH_DATA_JSON="./launch_data.json"
+BENCH_DATA_JSON="./random_bench_data.json"
 RESULT_DIR="./bench_results"
 
 ## Benchmark server stuff
@@ -13,21 +14,22 @@ source vanilla_run_utils.sh
 source utils.sh
 
 # Server ARGS
-SERVER_START_SLEEP=120
 SERVER_END_SLEEP=60
 SERVER_PORT=9010
+SERVER_LOG_FILE="./logs/server_logs_${timestamp}.txt"
+
+echo "Server logs stored at ${SERVER_LOG_FILE} ..."
 
 # DEFAULTS
 DATA_PARALLEL_SIZE=1
 TENSOR_PARALLEL_SIZE=1
 EP=0
 
-DRY_RUN=true
+DRY_RUN=false
 
 if ${DRY_RUN};
 then
 	SERVER_END_SLEEP=1
-	SERVER_START_SLEEP=1
 	NUM_BENCH_RUNS=1
 fi
 
@@ -36,28 +38,28 @@ num_benches=$(jq '. | length' ${BENCH_DATA_JSON})
 for ((i = 0 ; i < ${num_launches} ; i++ ));
 do
 	# extract server options
-	model=$(jq ".[$i].model" ${LAUNCH_DATA_JSON})
+	model=$(jq -r ".[$i].model" ${LAUNCH_DATA_JSON})
 	exit_if_null $model "model"
 
-	dp_size=$(jq ".[$i].dp_size" ${LAUNCH_DATA_JSON})
+	dp_size=$(jq -r ".[$i].dp_size" ${LAUNCH_DATA_JSON})
     if [ "$dp_size" = "null" ]
     then
         dp_size=$DATA_PARALLEL_SIZE
     fi
 
-	tp_size=$(jq ".[$i].tp_size" ${LAUNCH_DATA_JSON})
+	tp_size=$(jq -r ".[$i].tp_size" ${LAUNCH_DATA_JSON})
     if [ "$tp_size" = "null" ]
     then
         tp_size=$TENSOR_PARALLEL_SIZE
     fi
 
-	ep=$(jq ".[$i].ep" ${LAUNCH_DATA_JSON})
+	ep=$(jq -r ".[$i].ep" ${LAUNCH_DATA_JSON})
     if [ "$ep" = "null" ]
     then
         ep=$EP
     fi
 
-	envs=$(jq ".[$i].envs" ${LAUNCH_DATA_JSON})
+	envs=$(jq -r ".[$i].envs" ${LAUNCH_DATA_JSON})
 	if [ "$envs" = "null" ]
 	then
 		envs=""
@@ -68,7 +70,7 @@ do
 	export_envs "${envs}"
 
 	# launch server
-	launch_server ${model} ${dp_size} ${tp_size} ${ep} ${server_port}
+	launch_server $model ${dp_size} ${tp_size} ${ep} ${SERVER_PORT} ${SERVER_LOG_FILE}
 
 	for ((j = 0 ; j < ${num_benches} ; j++ ));
 	do
