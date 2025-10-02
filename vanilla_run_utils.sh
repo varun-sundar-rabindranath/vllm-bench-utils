@@ -1,51 +1,29 @@
+
+
 launch_server() {
-    	mlr=$1
-	engine=$2
-	model=$3
-	lora_adapter=$4
+	model=$1
+	dp_size=$2
+	tp_size=$3
+	ep=$4
 	server_port=$5
-	dry_run=$6
-    	export VLLM_USE_V1=$engine
 
-	OPT_FLAGS=""
-	if [ ${engine} -eq 1 ]; then
-		OPT_FLAGS="-O 0"
+	echo "Launching Server for ${model} - DP=${dp_size} TP=${tp_size} EP=${ep} ..."
+
+	EP_ARGS=""
+	if [ ${ep} -eq 1 ]; then
+		EP_ARGS="--enable-expert-parallel"
 	fi
 
-	LORA_ARGS=""
-	if ! [ ${mlr} -eq 0 ]; then
-		LORA_ARGS=" --enable-lora "
-		LORA_ARGS="${LORA_ARGS} --max-loras 4 "
-		LORA_ARGS="${LORA_ARGS} --max-lora-rank ${mlr} "
-		LORA_ARGS="${LORA_ARGS} --lora-modules lora0=${lora_adapter} lora1=${lora_adapter} lora2=${lora_adapter} lora3=${lora_adapter}"
-	fi
-
-	echo "Launching Server for V${engine}, max_lora_rank ${mlr} ..."
-
-	if ${dry_run};
-	then
-		echo
-		echo "Server command :"
-		echo "vllm serve  ${model} \
-		${LORA_ARGS} \
-		${OPT_FLAGS} \
-                --tensor-parallel-size 4 \
-                --enable-expert-parallel \
-		--no-enable-prefix-caching \
-		--port ${server_port} \
-		--disable-log-stats & "
-		echo
-		return
-	fi
+    export VLLM_ALL2ALL_BACKEND=${vllm_all2all_backend}
+	export VLLM_MXFP4_USE_MARLIN=${vllm_mxfp4_use_marlin}
 
 	vllm serve  ${model} \
-		${LORA_ARGS} \
-		${OPT_FLAGS} \
-                --tensor-parallel-size 4 \
-                --enable-expert-parallel \
+		--trust-remote-code \
+		--tensor-parallel-size ${tp_size} \
+		--data-parallel-size ${dp_size}  \
+		${EP_ARGS} \
 		--no-enable-prefix-caching \
-		--port ${server_port} \
-		--disable-log-stats &
+		--port ${server_port}  &
 			
 	#> server_log.txt 2>&1 &
 	server_pid=$!
@@ -53,54 +31,41 @@ launch_server() {
 	#echo "----${server_pid}----"
 }
 
-run_benchmark_serving() {
+run_benchmark_serving_sharegpt() {
 
-	mlr=$1
-	model=$2
-	num_prompts=$3
-	request_rate=$4
+	model=$1
+	num_prompts=$2
+	request_rate=$3
+	server_port=$4
+
+	vllm bench serve
+	--model ${model} \
+	--dataset-name sharegpt \
+	--dataset-path ./ShareGPT_V3_unfiltered_cleaned_split.json \
+	--num-prompts ${num_prompts} \
+	--request-rate ${request_rate} \
+	--ignore-eos \
+	--port ${server_port} \
+
+}
+
+run_benchmark_serving_random() {
+	model=$1
+	num_prompts=$2
+	isl=$3
+	osl=$4
 	server_port=$5
 	result_dir=$6
-	num_bench_runs=$7
-	dry_run=$8
 
-	LORA_ARGS=""
-	if ! [ ${mlr} -eq 0 ]; then
-		LORA_ARGS="${LORA_ARGS} --lora-modules lora0 lora1 lora2 lora3 "
-		#LORA_ARGS="${LORA_ARGS} --max-lora-rank ${mlr}"
-	fi
-
-	for (( i=1; i<=${num_bench_runs}; i++ ))
-	do
-
-		if $dry_run;
-		then
-			echo
-			echo "	python3 benchmarks/benchmark_serving.py \
-					--model ${model} \
-					--dataset-name sharegpt \
-					--dataset-path ./ShareGPT_V3_unfiltered_cleaned_split.json \
-					--num-prompts ${num_prompts} \
-					--request-rate ${request_rate} \
-					${LORA_ARGS} \
-					--seed ${i} \
-					--port ${server_port} \
-					--result-dir ${result_dir} \
-					--save-result"
-			continue
-		fi
-
-		python3 benchmarks/benchmark_serving.py \
-				--model ${model} \
-				--dataset-name sharegpt \
-				--dataset-path ./ShareGPT_V3_unfiltered_cleaned_split.json \
-				--num-prompts ${num_prompts} \
-				--request-rate ${request_rate} \
-				${LORA_ARGS} \
-				--seed ${i} \
-				--port ${server_port} \
-				--result-dir ${result_dir} \
-				--save-result
-	done
-
+	vllm bench serve \
+		--model ${model} \
+		--dataset-name random \
+		--num-prompts ${num_prompts} \
+		--random-input-len ${isl} \
+		--random-output-len ${osl} \
+		--ignore-eos \
+		--port ${server_port} \
+		--backend vllm \
+		--result-dir ${result_dir} \
+        --save-result
 }
