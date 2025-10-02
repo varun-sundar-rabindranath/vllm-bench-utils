@@ -1,10 +1,10 @@
 #!/bin/bash
 set -e
 set -u
-#set -x
+set -x
 
-LAUNCH_DATA_JSON="./launch_data.json"
-BENCH_DATA_JSON="./random_bench_data.json"
+LAUNCH_DATA_JSON="./test_launch_data.json"
+BENCH_DATA_JSON="./test_bench_data.json"
 RESULT_DIR="./bench_results"
 
 ## Benchmark server stuff
@@ -65,7 +65,7 @@ do
 
 	echo "Bench : model=${model}, dp_size=${dp_size}, tp_size=${tp_size}, ep=${ep}, envs=${envs} ..."
 
-	export_envs ${envs}
+	export_envs "${envs}"
 
 	# launch server
 	launch_server ${model} ${dp_size} ${tp_size} ${ep} ${server_port}
@@ -87,7 +87,7 @@ do
 		run_benchmark_serving_random  $model $num_prompts $isl $osl $SERVER_PORT $RESULT_DIR
 	done
 
-	unset_envs ${envs}
+	unset_envs "${envs}"
 
 	if ! ${DRY_RUN};
 	then

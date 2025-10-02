@@ -1,0 +1,12 @@
+[
+    {
+        "num_prompts": 16,
+        "isl": 1,
+        "osl": 1000
+    },
+    {
+        "num_prompts": 32,
+        "isl": 1,
+        "osl": 1000
+    }
+]

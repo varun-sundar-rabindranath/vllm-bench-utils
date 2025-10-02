@@ -2,26 +2,23 @@
 
 export_envs() {
 	envs=$1
-
-	keys=$(echo ${envs} | jq 'keys_unsorted')
-	num_keys=$(echo ${envs} | jq '. | length')
-	for ((key_idx = 0 ; key_idx < ${num_keys} ; key_idx++ ));
+    keys=()
+    values=()
+    eval $(echo $envs |jq -r 'to_entries[]| "keys+=(\(.key));"')
+    eval $(echo $envs |jq -r 'to_entries[]| "values+=(\(.value));"')
+	for ((idx = 0 ; idx < ${#keys[@]} ; idx++ ));
 	do
-		key=$keys[$key_idx]
-		value=$(echo ${envs} | jq ".$key")
-		export $key=$value
+		export ${keys[${idx}]}=${values[${idx}]}
 	done
 }
 
 unset_envs() {
 	envs=$1
-
-	keys=$(echo ${envs} | jq 'keys_unsorted')
-	num_keys=$(echo ${envs} | jq '. | length')
-	for ((key_idx = 0 ; key_idx < ${num_keys} ; key_idx++ ));
+    keys=()
+    eval $(echo $envs |jq -r 'to_entries[]| "keys+=(\(.key));"')
+	for ((idx = 0 ; idx < ${#keys[@]} ; idx++ ));
 	do
-		key=$keys[$key_idx]
-		unset $key
+		unset ${keys[${idx}]}
 	done
 }
 
