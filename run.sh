@@ -6,6 +6,8 @@ timestamp=$(date +%s)
 
 LAUNCH_DATA_JSON="./launch_data.json"
 BENCH_DATA_JSON="./random_bench_data.json"
+#LAUNCH_DATA_JSON="./test_launch_data.json"
+#BENCH_DATA_JSON="./test_bench_data.json"
 RESULT_DIR="./bench_results"
 
 ## Benchmark server stuff
@@ -42,22 +44,22 @@ do
 	exit_if_null $model "model"
 
 	dp_size=$(jq -r ".[$i].dp_size" ${LAUNCH_DATA_JSON})
-    if [ "$dp_size" = "null" ]
-    then
-        dp_size=$DATA_PARALLEL_SIZE
-    fi
+    	if [ "$dp_size" = "null" ]
+    	then
+    	    dp_size=$DATA_PARALLEL_SIZE
+    	fi
 
 	tp_size=$(jq -r ".[$i].tp_size" ${LAUNCH_DATA_JSON})
-    if [ "$tp_size" = "null" ]
-    then
-        tp_size=$TENSOR_PARALLEL_SIZE
-    fi
+    	if [ "$tp_size" = "null" ]
+    	then
+    	    tp_size=$TENSOR_PARALLEL_SIZE
+    	fi
 
 	ep=$(jq -r ".[$i].ep" ${LAUNCH_DATA_JSON})
-    if [ "$ep" = "null" ]
-    then
-        ep=$EP
-    fi
+    	if [ "$ep" = "null" ]
+    	then
+    	    ep=$EP
+    	fi
 
 	envs=$(jq -r ".[$i].envs" ${LAUNCH_DATA_JSON})
 	if [ "$envs" = "null" ]
@@ -84,9 +86,15 @@ do
 		osl=$(jq ".[$j].osl" ${BENCH_DATA_JSON})
 		exit_if_null $osl "osl"
 
-		echo "	num_prompts=${num_prompts}, isl=${isl}, osl=${osl} ..."
+		rr=$(jq ".[$j].request_rate" ${BENCH_DATA_JSON})
+		if [ "$rr" = "null" ]
+		then
+			rr=${num_prompts} # same as inf
+		fi
+
+		echo "	num_prompts=${num_prompts}, isl=${isl}, osl=${osl}, rr=${rr} ..."
 		 
-		run_benchmark_serving_random  $model $num_prompts $isl $osl $SERVER_PORT $RESULT_DIR
+		run_benchmark_serving_random  $model $num_prompts $isl $osl $rr $SERVER_PORT $RESULT_DIR
 	done
 
 	unset_envs "${envs}"

@@ -56,8 +56,9 @@ run_benchmark_serving_random() {
 	num_prompts=$2
 	isl=$3
 	osl=$4
-	server_port=$5
-	result_dir=$6
+	rr=$5
+	server_port=$6
+	result_dir=$7
 
 	set -x
 	vllm bench serve \
@@ -66,6 +67,7 @@ run_benchmark_serving_random() {
 		--num-prompts ${num_prompts} \
 		--random-input-len ${isl} \
 		--random-output-len ${osl} \
+		--request-rate ${rr} \
 		--ignore-eos \
 		--port ${server_port} \
 		--backend vllm \

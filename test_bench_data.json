@@ -2,7 +2,8 @@
     {
         "num_prompts": 16,
         "isl": 1,
-        "osl": 1000
+        "osl": 1000,
+	"request_rate": 1
     },
     {
         "num_prompts": 32,
