@@ -72,9 +72,12 @@ do
 	export_envs "${envs}"
 
 	# launch server
-	launch_server $model ${dp_size} ${tp_size} ${ep} ${SERVER_PORT} ${SERVER_LOG_FILE}
+	if ! ${DRY_RUN};
+	then
+		launch_server $model ${dp_size} ${tp_size} ${ep} ${SERVER_PORT} ${SERVER_LOG_FILE}
+		echo "server_pid=${server_pid}"
+	fi
 
-	echo "server_pid=${server_pid}"
 
 	for ((j = 0 ; j < ${num_benches} ; j++ ));
 	do
@@ -86,7 +89,7 @@ do
 		num_prompts=$(jq -r ".[$j].num_prompts" ${BENCH_DATA_JSON})
 		exit_if_null $num_prompts "num_prompts"
 
-		rr=$(jq -r ".[$j].request_rate" ${BENCH_DATA_JSON})
+		rr=$(jq -r ".[$j].rr" ${BENCH_DATA_JSON})
 		if [ "$rr" = "null" ]
 		then
 			rr=${num_prompts} # same as inf
