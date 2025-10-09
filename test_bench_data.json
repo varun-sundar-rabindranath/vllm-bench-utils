@@ -1,13 +1,25 @@
 [
     {
+        "num_prompts": 64,
+	"rr": 32,
+	"type": "sharegpt"
+    },
+    {
         "num_prompts": 16,
         "isl": 1,
         "osl": 1000,
-	"request_rate": 1
+	"request_rate": 1,
+	"type": "random"
     },
     {
         "num_prompts": 32,
         "isl": 1,
-        "osl": 1000
+        "osl": 1000,
+	"type": "random"
+    },
+    {
+        "num_prompts": 64,
+	"rr": 32,
+	"type": "sharegp"
     }
 ]

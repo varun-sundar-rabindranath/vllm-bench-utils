@@ -1,5 +1,16 @@
 [
     {
+    	"model": "openai/gpt-oss-120b",
+    	"dp_size": 2,
+    	"tp_size": 1,
+    	"ep": 1,
+    	"envs": {
+    		"VLLM_ALL2ALL_BACKEND": "deepep_low_latency",
+    		"VLLM_MXFP4_USE_MARLIN": 1,
+    		"VLLM_MOE_DP_CHUNK_SIZE": 256
+    	}
+    },
+    {
         "model": "openai/gpt-oss-20b",
         "tp_size": 2
     }

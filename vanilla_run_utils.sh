@@ -37,16 +37,27 @@ run_benchmark_serving_sharegpt() {
 	num_prompts=$2
 	request_rate=$3
 	server_port=$4
+	result_dir=$5
+	result_filename=$6
+
+	local FILE=ShareGPT_V3_unfiltered_cleaned_split.json
+  	if [ ! -f "$FILE" ]; then
+		echo "Downloading ShareGPT.."
+		wget https://huggingface.co/datasets/anon8231489123/ShareGPT_Vicuna_unfiltered/resolve/main/ShareGPT_V3_unfiltered_cleaned_split.json
+	fi
 
 	set -x
-	vllm bench serve
+	vllm bench serve \
 	--model ${model} \
 	--dataset-name sharegpt \
 	--dataset-path ./ShareGPT_V3_unfiltered_cleaned_split.json \
 	--num-prompts ${num_prompts} \
 	--request-rate ${request_rate} \
 	--ignore-eos \
-	--port ${server_port} 
+	--port ${server_port} \
+	--result-dir ${result_dir} \
+	--result-filename ${result_filename} \
+        --save-result
 	set +x
 
 }
@@ -59,6 +70,7 @@ run_benchmark_serving_random() {
 	rr=$5
 	server_port=$6
 	result_dir=$7
+	result_filename=$8
 
 	set -x
 	vllm bench serve \
@@ -72,6 +84,7 @@ run_benchmark_serving_random() {
 		--port ${server_port} \
 		--backend vllm \
 		--result-dir ${result_dir} \
-        --save-result
+		--result-filename ${result_filename} \
+        	--save-result
 	set +x
 }

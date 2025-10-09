@@ -1,0 +1,47 @@
+[
+    {
+        "num_prompts": 200,
+	"rr": 1,
+	"type": "sharegpt"
+    },
+    {
+        "num_prompts": 400,
+	"rr": 2,
+	"type": "sharegpt"
+    },
+    {
+        "num_prompts": 1000,
+	"rr": 4,
+	"type": "sharegpt"
+    },
+    {
+        "num_prompts": 1000,
+	"rr": 8,
+	"type": "sharegpt"
+    },
+    {
+        "num_prompts": 1000,
+	"rr": 16,
+	"type": "sharegpt"
+    },
+    {
+        "num_prompts": 1000,
+	"rr": 32,
+	"type": "sharegpt"
+    },
+    {
+        "num_prompts": 1000,
+	"rr": 48,
+	"type": "sharegpt"
+    },
+    {
+        "num_prompts": 1000,
+	"rr": 64,
+	"type": "sharegpt"
+    },
+    {
+        "num_prompts": 1000,
+	"rr":1000,
+	"type": "sharegpt"
+    }
+]
