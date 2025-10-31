@@ -11,11 +11,11 @@ do_what $@
 
 timestamp=$(date +%s)
 
-#LAUNCH_DATA_JSON="./launch_data.json"
-#BENCH_DATA_JSON="./bench_data.json"
+LAUNCH_DATA_JSON="./launch_data.json"
+BENCH_DATA_JSON="./prefill_decode_mixed_bench_data.json"
 #LAUNCH_DATA_JSON="./test_launch_data.json"
-LAUNCH_DATA_JSON="./deepgemm_test_launch_data.json"
-BENCH_DATA_JSON="./test_bench_data.json"
+#BENCH_DATA_JSON="./test_bench_data.json"
+
 RESULT_DIR="./bench_results"
 SERVER_LOGS_DIR="./logs"
 LM_EVAL_DIR="./lm_eval_results"
