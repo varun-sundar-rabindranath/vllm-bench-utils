@@ -6,9 +6,12 @@ launch_server() {
 	tp_size=$3
 	ep=$4
 	server_port=$5
-	server_log_file=$6
+	server_logs_dir=$6
 
-	echo "Launching Server for ${model} - DP=${dp_size} TP=${tp_size} EP=${ep} ..."
+	server_timestamp=$(date +%s)
+	server_log_file="./${server_logs_dir}/server_logs_${server_timestamp}.txt"
+
+	echo "Launching Server for ${model} - DP=${dp_size} TP=${tp_size} EP=${ep} ...( logs = ${server_log_file})"
 
 	EP_ARGS=""
 	if [ ${ep} -eq 1 ]; then

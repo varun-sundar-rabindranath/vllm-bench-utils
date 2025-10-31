@@ -17,11 +17,11 @@ timestamp=$(date +%s)
 LAUNCH_DATA_JSON="./deepgemm_test_launch_data.json"
 BENCH_DATA_JSON="./test_bench_data.json"
 RESULT_DIR="./bench_results"
-LOGS_DIR="./logs"
+SERVER_LOGS_DIR="./logs"
 LM_EVAL_DIR="./lm_eval_results"
 
 mkdir -p ${RESULT_DIR}
-mkdir -p ${LOGS_DIR}
+mkdir -p ${SERVER_LOGS_DIR}
 mkdir -p ${LM_EVAL_DIR}
 
 ## Benchmark server stuff
@@ -32,9 +32,6 @@ source utils.sh
 # Server ARGS
 SERVER_END_SLEEP=60
 SERVER_PORT=9010
-SERVER_LOG_FILE="./${LOGS_DIR}/server_logs_${timestamp}.txt"
-
-echo "Server logs stored at ${SERVER_LOG_FILE} ..."
 
 # DEFAULTS
 DATA_PARALLEL_SIZE=1
@@ -87,7 +84,7 @@ do
 	# launch server
 	if ! ${DRY_RUN};
 	then
-		launch_server $model ${dp_size} ${tp_size} ${ep} ${SERVER_PORT} ${SERVER_LOG_FILE}
+		launch_server $model ${dp_size} ${tp_size} ${ep} ${SERVER_PORT} ${SERVER_LOGS_DIR}
 		echo "server_pid=${server_pid}"
 	fi
 
