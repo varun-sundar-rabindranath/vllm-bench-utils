@@ -1,0 +1,19 @@
+[
+    {
+    	"num_prompts": 256,
+    	"isl": 8192,
+    	"osl": 1,
+    	"request_rate": 256
+    },
+    {
+    	"num_prompts": 128,
+    	"isl": 1,
+    	"osl": 1024,
+    	"request_rate": 128
+    },
+    {
+        "num_prompts": 1000,
+	"rr": 1000,
+	"type": "sharegpt"
+    }
+]
