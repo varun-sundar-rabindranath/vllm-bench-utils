@@ -3,13 +3,15 @@
     	"num_prompts": 256,
     	"isl": 8192,
     	"osl": 1,
-    	"request_rate": 256
+    	"request_rate": 256,
+	"type": "random"
     },
     {
     	"num_prompts": 128,
     	"isl": 1,
     	"osl": 1024,
-    	"request_rate": 128
+    	"request_rate": 128,
+	"type": "random"
     },
     {
         "num_prompts": 1000,
