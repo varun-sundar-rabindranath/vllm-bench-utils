@@ -13,7 +13,8 @@ timestamp=$(date +%s)
 
 #LAUNCH_DATA_JSON="./launch_data.json"
 #BENCH_DATA_JSON="./bench_data.json"
-LAUNCH_DATA_JSON="./test_launch_data.json"
+#LAUNCH_DATA_JSON="./test_launch_data.json"
+LAUNCH_DATA_JSON="./deepgemm_test_launch_data.json"
 BENCH_DATA_JSON="./test_bench_data.json"
 RESULT_DIR="./bench_results"
 LOGS_DIR="./logs"

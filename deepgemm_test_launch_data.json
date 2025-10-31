@@ -1,0 +1,78 @@
+[
+    {
+        "model": "Qwen/Qwen3-30B-A3B-FP8",
+        "dp_size": 2,
+        "tp_size": 1,
+        "ep": 1,
+        "envs": {
+            "VLLM_ALL2ALL_BACKEND": "deepep_low_latency",
+            "VLLM_USE_DEEP_GEMM": 1
+        }
+    },
+    {
+        "model": "Qwen/Qwen3-30B-A3B-FP8",
+        "dp_size": 2,
+        "tp_size": 1,
+        "ep": 1,
+        "envs": {
+            "VLLM_ALL2ALL_BACKEND": "deepep_high_throughput",
+            "VLLM_USE_DEEP_GEMM": 1
+        }
+    },
+    {
+        "model": "Qwen/Qwen3-30B-A3B-FP8",
+        "dp_size": 2,
+        "tp_size": 1,
+        "ep": 1,
+        "envs": {
+            "VLLM_ALL2ALL_BACKEND": "deepep_low_latency",
+            "VLLM_USE_DEEP_GEMM": 0
+        }
+    },
+    {
+        "model": "Qwen/Qwen3-30B-A3B-FP8",
+        "dp_size": 2,
+        "tp_size": 1,
+        "ep": 1,
+        "envs": {
+            "VLLM_ALL2ALL_BACKEND": "deepep_high_throughput",
+            "VLLM_USE_DEEP_GEMM": 0
+        }
+    },
+    {
+        "model": "Qwen/Qwen3-30B-A3B-FP8",
+        "dp_size": 1,
+        "tp_size": 2,
+        "ep": 0,
+        "envs": {
+            "VLLM_USE_DEEP_GEMM": 1
+        }
+    },
+    {
+        "model": "Qwen/Qwen3-30B-A3B-FP8",
+        "dp_size": 1,
+        "tp_size": 2,
+        "ep": 0,
+        "envs": {
+            "VLLM_USE_DEEP_GEMM": 0
+        }
+    },
+    {
+        "model": "Qwen/Qwen3-30B-A3B-FP8",
+        "dp_size": 1,
+        "tp_size": 2,
+        "ep": 1,
+        "envs": {
+            "VLLM_USE_DEEP_GEMM": 1
+        }
+    },
+    {
+        "model": "Qwen/Qwen3-30B-A3B-FP8",
+        "dp_size": 1,
+        "tp_size": 2,
+        "ep": 1,
+        "envs": {
+            "VLLM_USE_DEEP_GEMM": 0
+        }
+    }
+]
