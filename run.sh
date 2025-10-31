@@ -8,7 +8,6 @@ DO_LM_EVAL=false
 source cli.sh
 do_what $@
 
-
 timestamp=$(date +%s)
 
 LAUNCH_DATA_JSON="./launch_data.json"
@@ -45,6 +44,11 @@ then
 	SERVER_END_SLEEP=1
 	NUM_BENCH_RUNS=1
 fi
+
+set -x
+## Nuke the torch.compile cache
+rm -rf ~/.cache/vllm/torch_compile_cache
+set +x
 
 num_launches=$(jq '. | length' ${LAUNCH_DATA_JSON})
 for ((i = 0 ; i < ${num_launches} ; i++ ));
