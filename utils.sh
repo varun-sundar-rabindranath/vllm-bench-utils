@@ -46,8 +46,8 @@ exit_if_null() {
 	fi
 }
 
-make_filename() {
-	make_filename_result=""
+describe_server() {
+	server_description=""
 
 	model=$1
 	dp_size=$2
@@ -61,5 +61,5 @@ make_filename() {
 	envs_as_str_result=""
 	envs_as_str "${envs}"
 
-	make_filename_result=${model_name}_${dp_size}_${tp_size}_${envs_as_str_result}_${ts}.json
+	server_description=${model_name}_${dp_size}_${tp_size}_${envs_as_str_result}_${ts}
 }

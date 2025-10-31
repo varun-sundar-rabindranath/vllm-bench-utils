@@ -2,13 +2,26 @@
 set -e
 set -u
 
+# Process CLI args
+DO_BENCH=false
+DO_LM_EVAL=false
+source cli.sh
+do_what $@
+
+
 timestamp=$(date +%s)
 
-LAUNCH_DATA_JSON="./launch_data.json"
-BENCH_DATA_JSON="./bench_data.json"
-#LAUNCH_DATA_JSON="./test_launch_data.json"
-#BENCH_DATA_JSON="./test_bench_data.json"
+#LAUNCH_DATA_JSON="./launch_data.json"
+#BENCH_DATA_JSON="./bench_data.json"
+LAUNCH_DATA_JSON="./test_launch_data.json"
+BENCH_DATA_JSON="./test_bench_data.json"
 RESULT_DIR="./bench_results"
+LOGS_DIR="./logs"
+LM_EVAL_DIR="./lm_eval_results"
+
+mkdir -p ${RESULT_DIR}
+mkdir -p ${LOGS_DIR}
+mkdir -p ${LM_EVAL_DIR}
 
 ## Benchmark server stuff
 server_pid=""
@@ -18,7 +31,7 @@ source utils.sh
 # Server ARGS
 SERVER_END_SLEEP=60
 SERVER_PORT=9010
-SERVER_LOG_FILE="./logs/server_logs_${timestamp}.txt"
+SERVER_LOG_FILE="./${LOGS_DIR}/server_logs_${timestamp}.txt"
 
 echo "Server logs stored at ${SERVER_LOG_FILE} ..."
 
@@ -36,7 +49,6 @@ then
 fi
 
 num_launches=$(jq '. | length' ${LAUNCH_DATA_JSON})
-num_benches=$(jq '. | length' ${BENCH_DATA_JSON})
 for ((i = 0 ; i < ${num_launches} ; i++ ));
 do
 	# extract server options
@@ -67,7 +79,7 @@ do
 		envs=""
 	fi
 
-	echo "Bench : model=${model}, dp_size=${dp_size}, tp_size=${tp_size}, ep=${ep}, envs=${envs} ..."
+	echo "Process : model=${model}, dp_size=${dp_size}, tp_size=${tp_size}, ep=${ep}, envs=${envs} ..."
 
 	export_envs "${envs}"
 
@@ -78,45 +90,17 @@ do
 		echo "server_pid=${server_pid}"
 	fi
 
+	server_description=""
+	describe_server $model ${dp_size} ${tp_size} "${envs}"
+	SERVER_DESCRIPTION=${server_description}
 
-	for ((j = 0 ; j < ${num_benches} ; j++ ));
-	do
-		# extract bench options
+	if ${DO_BENCH}; then
+		run_bench ${model} ${SERVER_PORT} ${BENCH_DATA_JSON} ${RESULT_DIR} ${SERVER_DESCRIPTION} 
+	fi
 
-		bench_type=$(jq -r ".[$j].type" ${BENCH_DATA_JSON})
-		exit_if_null $bench_type "BenchType"
-
-		num_prompts=$(jq -r ".[$j].num_prompts" ${BENCH_DATA_JSON})
-		exit_if_null $num_prompts "num_prompts"
-
-		rr=$(jq -r ".[$j].rr" ${BENCH_DATA_JSON})
-		if [ "$rr" = "null" ]
-		then
-			rr=${num_prompts} # same as inf
-		fi
-
-		isl=$(jq -r ".[$j].isl" ${BENCH_DATA_JSON})
-
-		osl=$(jq -r ".[$j].osl" ${BENCH_DATA_JSON})
-
-		make_filename_result=""
-		make_filename $model ${dp_size} ${tp_size} "${envs}"
-		RESULT_FILENAME=${make_filename_result}
-
-		echo " bench_type=${bench_type}, num_prompts=${num_prompts}, rr=${rr}, isl=${isl}, osl=${osl} -> ${RESULT_FILENAME} ..."
-
-		if [ "$bench_type" == "sharegpt" ];
-		then
-			run_benchmark_serving_sharegpt  $model $num_prompts $rr $SERVER_PORT $RESULT_DIR $RESULT_FILENAME
-		elif [ "$bench_type" == "random" ];
-		then
-			exit_if_null $isl "isl"
-			exit_if_null $osl "osl"
-			run_benchmark_serving_random  $model $num_prompts $isl $osl $rr $SERVER_PORT $RESULT_DIR $RESULT_FILENAME
-		else
-			echo "Invalid bench_type ${bench_type}"
-		fi
-	done
+	if ${DO_LM_EVAL}; then
+		run_lm_eval ${model} ${SERVER_PORT} ${LM_EVAL_DIR} ${SERVER_DESCRIPTION}
+	fi
 
 	unset_envs "${envs}"
 
