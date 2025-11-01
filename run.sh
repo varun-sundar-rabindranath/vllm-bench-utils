@@ -11,7 +11,7 @@ do_what $@
 
 timestamp=$(date +%s)
 
-LAUNCH_DATA_JSON="./data/launch_data.json"
+LAUNCH_DATA_JSON="./data/gptoss_test_launch_data.json"
 BENCH_DATA_JSON="./data/prefill_decode_mixed_bench_data.json"
 #LAUNCH_DATA_JSON="./data/test_launch_data.json"
 #BENCH_DATA_JSON="./data/test_bench_data.json"
@@ -120,7 +120,11 @@ do
 
 	if ! ${DRY_RUN};
 	then
+		set +e
+		# Error turned off as the server could have exited and kill doesn't
+		# find the process id.
 		kill ${server_pid}
+		set -e
 	fi
 
 	echo "Waiting ${SERVER_END_SLEEP} secs for server end..."

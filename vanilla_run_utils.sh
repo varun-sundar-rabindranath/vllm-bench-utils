@@ -205,8 +205,8 @@ run_test_init() {
 		fi
 	done
 
-	server_start_wait_time=$(( $timeout - 600 ))
-	echo -n "SERVER START WAIT TIME ${server_start_wait_time} : "
+	server_start_wait_time=$(( 600 - $timeout ))
+	echo -n "SERVER START WAIT TIME ${server_start_wait_time}s : "
 
 	RED='\033[0;31m'
 	GREEN='\033[0;32m'
