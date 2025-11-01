@@ -1,0 +1,70 @@
+[
+    {
+        "model": "openai/gpt-oss-20b"
+    },
+    {
+        "model": "openai/gpt-oss-20b",
+        "eager": 1
+    },
+    {
+        "model": "openai/gpt-oss-20b",
+        "dp_size": 2,
+        "ep": 1
+    },
+    {
+        "model": "openai/gpt-oss-20b",
+        "dp_size": 2,
+        "ep": 1,
+        "eager": 1
+    },
+    {
+        "model": "openai/gpt-oss-20b",
+        "tp_size": 2
+    },
+    {
+        "model": "openai/gpt-oss-20b",
+        "tp_size": 2,
+        "eager": 1
+    },
+    {
+        "model": "openai/gpt-oss-20b",
+        "tp_size": 2,
+        "ep": 1
+    },
+    {
+        "model": "openai/gpt-oss-20b",
+        "tp_size": 2,
+        "eager": 1,
+        "ep": 1
+    },
+    {
+        "model": "openai/gpt-oss-20b",
+        "dp_size": 2,
+        "tp_size": 1,
+        "ep": 1,
+        "envs": {
+            "VLLM_ALL2ALL_BACKEND": "deepep_high_throughput"
+        }
+    },
+    {
+        "model": "openai/gpt-oss-20b",
+        "eager": 1,
+        "envs": {
+            "VLLM_USE_FLASHINFER_MOE_MXFP4_MXFP8": 1
+        }
+    },
+    {
+        "model": "openai/gpt-oss-20b",
+        "eager": 1,
+        "envs": {
+            "VLLM_USE_FLASHINFER_MOE_MXFP4_MXFP8_CUTLASS": 1
+        }
+    },
+    {
+        "model": "openai/gpt-oss-20b",
+        "eager": 1,
+        "envs": {
+            "VLLM_USE_FLASHINFER_MOE_MXFP4_BF16": 1
+        }
+    }
+]

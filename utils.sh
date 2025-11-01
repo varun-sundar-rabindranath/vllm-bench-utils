@@ -52,7 +52,8 @@ describe_server() {
 	model=$1
 	dp_size=$2
 	tp_size=$3
-	envs=$4
+	eager=$4
+	envs=$5
 	ts=$(date +%s)
 
 	# fix model. No forward slash in file name 
@@ -61,5 +62,5 @@ describe_server() {
 	envs_as_str_result=""
 	envs_as_str "${envs}"
 
-	server_description=${model_name}_${dp_size}_${tp_size}_${envs_as_str_result}_${ts}
+	server_description="${model_name}_dp=${dp_size}_tp=${tp_size}_eager=${eager}_${envs_as_str_result}_ts=${ts}"
 }

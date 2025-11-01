@@ -5,17 +5,21 @@ launch_server() {
 	dp_size=$2
 	tp_size=$3
 	ep=$4
-	server_port=$5
-	server_logs_dir=$6
+	eager=$5
+	server_port=$6
+	server_logs_dir=$7
 
 	server_timestamp=$(date +%s)
 	server_log_file="./${server_logs_dir}/server_logs_${server_timestamp}.txt"
 
-	echo "Launching Server for ${model} - DP=${dp_size} TP=${tp_size} EP=${ep} ...( logs = ${server_log_file})"
+	echo "Launching Server for ${model} - DP=${dp_size} TP=${tp_size} EP=${ep} Eager=${eager} ...( logs = ${server_log_file})"
 
-	EP_ARGS=""
+	EXTRA_ARGS=""
 	if [ ${ep} -eq 1 ]; then
-		EP_ARGS="--enable-expert-parallel"
+		EXTRA_ARGS=" --enable-expert-parallel "
+	fi
+	if [ ${eager} -eq 1 ]; then
+		EXTRA_ARGS=" --enforce-eager "
 	fi
 
 	set -x 
@@ -23,7 +27,7 @@ launch_server() {
 		--trust-remote-code \
 		--tensor-parallel-size ${tp_size} \
 		--data-parallel-size ${dp_size}  \
-		${EP_ARGS} \
+		${EXTRA_ARGS} \
 		--no-enable-prefix-caching \
 		--port ${server_port} > ${server_log_file} 2>&1 &
 	set +x
@@ -176,4 +180,41 @@ run_lm_eval() {
 		--model_args model=${model},base_url=${endpoint}/v1/completions,num_concurrent=30,max_retries=3 \
 		--limit 100 2>&1 | tee ${RESULT_FILENAME}
 	set +x
+}
+
+run_test_init() {
+
+	model=$1
+	SERVER_PORT=$2
+
+	endpoint="http://localhost:${SERVER_PORT}"
+
+	timeout=600
+	echo -n "Waiting for server to be up (timeout=${timeout}s): "
+	while [ $timeout -gt 0 ]
+	do
+		set +e
+		http_code=$(curl -s -o /dev/null -i  -w "%{http_code}" ${endpoint}/ping)
+		set -e
+		if [ "${http_code}" == "200" ]; then
+			break
+		else
+			echo -n "."
+			timeout=$(( $timeout - 2 ))
+			sleep 2
+		fi
+	done
+
+	server_start_wait_time=$(( $timeout - 600 ))
+	echo -n "SERVER START WAIT TIME ${server_start_wait_time} : "
+
+	RED='\033[0;31m'
+	GREEN='\033[0;32m'
+	NC='\033[0m'
+	if [ ${timeout} -eq 0 ]; then
+		echo -e -n "${RED} FAIL ${NC}"
+	else
+		echo -e -n "${GREEN} PASS ${NC}"
+	fi
+	echo ""
 }
